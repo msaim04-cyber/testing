@@ -22,6 +22,8 @@ jobs:
 
       - name: Copy repo to EC2
         run: |
+          pwd
+          ls -la
           rsync -avz --delete --exclude='.git' -e "ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no" ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/app/
 
       - name: Run deploy script on EC2
