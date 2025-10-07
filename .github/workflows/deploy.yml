@@ -26,6 +26,20 @@ jobs:
           ls -la
           rsync -avz --delete --exclude='.git' -e "ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no" ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/app/
 
+      - name: Debug EC2 file structure
+        run: |
+          ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            echo 'Current user:'; whoami
+            echo -e '\nHome directory:'; pwd
+            echo -e '\nApp directory contents:'; ls -la ~/app/
+            echo -e '\nDeploy.sh details:'; ls -la ~/app/deploy.sh || echo 'Cannot list deploy.sh'
+            echo -e '\nFile exists:'; [ -f ~/app/deploy.sh ] && echo 'YES' || echo 'NO'
+          "
+
       - name: Run deploy script on EC2
         run: |
-          ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "chmod +x ~/app/deploy.sh && ~/app/deploy.sh"
+          ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            cd /home/ubuntu/app &&
+            chmod +x deploy.sh &&
+            ./deploy.sh
+          "
